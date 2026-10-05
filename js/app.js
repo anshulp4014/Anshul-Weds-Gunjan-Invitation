@@ -129,23 +129,19 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 const shloka=$('#shloka');let musicOn=false,onMain=false;const VOL=.7;
 function ramp(el,to,ms){cancelAnimationFrame(el._r);const from=el.volume,t0=performance.now();(function f(n){const q=Math.max(0,Math.min(1,(n-t0)/ms));el.volume=Math.max(0,Math.min(1,from+(to-from)*q));if(q<1)el._r=requestAnimationFrame(f);else if(to===0)el.pause();})(t0);}
 const cur=()=>onMain?music:shloka;
-const conn=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
-const saveData=!!(conn&&(conn.saveData||/2g/.test(conn.effectiveType||'')));
-function armAudio(el){if(!el||el.dataset.armed)return;el.dataset.armed='1';el.preload='auto';try{el.load();}catch(e){}}
-function warmWedding(){if(saveData)return;armAudio(music);}
-/* Warm shloka on first gate touch (gesture-friendly); defer wedding until after entry */
-$('#gate')&&$('#gate').addEventListener('pointerdown',()=>{armAudio(shloka);},{once:true,passive:true});
+/* Eager-load both tracks on page open so play starts immediately after the gate */
+try{shloka.load();music.load();}catch(e){}
 
 /* the shloka carries the blessings chapter; the wedding song takes over from the invitation on */
 function setTrack(main){if(!musicOn||main===onMain)return;onMain=main;
  const on=main?music:shloka,off=main?shloka:music;
- armAudio(on);on.volume=0;const p=on.play();if(p&&p.catch)p.catch(()=>{});
+ on.volume=0;const p=on.play();if(p&&p.catch)p.catch(()=>{});
  ramp(on,VOL,1800);ramp(off,0,1800);}
-function startMusic(){musicOn=true;armAudio(shloka);shloka.volume=0;const p=shloka.play();if(p&&p.then)p.then(()=>{mBtn.hidden=false;ramp(shloka,VOL,2500);if('requestIdleCallback' in window)requestIdleCallback(warmWedding,{timeout:2500});else setTimeout(warmWedding,1200);}).catch(()=>{});$('#shareBtn').hidden=false;}
+function startMusic(){musicOn=true;shloka.volume=0;const p=shloka.play();if(p&&p.then)p.then(()=>{mBtn.hidden=false;ramp(shloka,VOL,2500);}).catch(()=>{});$('#shareBtn').hidden=false;}
 
-mBtn.addEventListener('click',()=>{const el=cur();if(musicOn){musicOn=false;music.pause();shloka.pause();mBtn.style.opacity=.55;mBtn.setAttribute('aria-label','Play music');}else{musicOn=true;armAudio(el);el.volume=VOL;el.play();mBtn.style.opacity=1;mBtn.setAttribute('aria-label','Pause music');}});
+mBtn.addEventListener('click',()=>{const el=cur();if(musicOn){musicOn=false;music.pause();shloka.pause();mBtn.style.opacity=.55;mBtn.setAttribute('aria-label','Play music');}else{musicOn=true;el.volume=VOL;el.play();mBtn.style.opacity=1;mBtn.setAttribute('aria-label','Pause music');}});
 shloka.addEventListener('error',()=>{if(!onMain)setTrack(true);});
-addEventListener('scroll',()=>{const c2=$('#ch2');if(!c2)return;const near=c2.getBoundingClientRect().top<innerHeight*1.2;if(near)warmWedding();setTrack(c2.getBoundingClientRect().top<innerHeight*.55);},{passive:true});
+addEventListener('scroll',()=>{const c2=$('#ch2');if(c2)setTrack(c2.getBoundingClientRect().top<innerHeight*.55);},{passive:true});
 music.addEventListener('error',()=>{mBtn.hidden=true;});
 const HOTEL='Hotel Sagar View, Galu, Barsar, Distt. Hamirpur, Himachal Pradesh',HOME='V.P.O. Kanoh, Ward No. 3, Tehsil Barsar, Distt. Hamirpur, Himachal Pradesh';
 const EVS=[['Ladies Sangeet','2026-12-10T13:30Z',1,HOME],['Cocktail · DJ Night · Dine','2026-12-10T14:00Z',3.5,HOME],['Lunch','2026-12-11T07:00Z',2,HOME],['Sehra Bandi','2026-12-11T10:30Z',2,HOME],['Departure of Barat','2026-12-11T12:30Z',1,HOME],['Vadhu Pravesh','2026-12-12T02:30Z',1.5,HOME],['Dhaam','2026-12-12T07:00Z',3,HOME]];

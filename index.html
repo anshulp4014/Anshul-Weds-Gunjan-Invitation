@@ -12,6 +12,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Tiro+Devanagari+Hindi&family=Jost:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="preload" href="assets/shloka.mp3" as="audio" type="audio/mpeg">
+<link rel="preload" href="assets/wedding.mp3" as="audio" type="audio/mpeg">
 </head>
 <body class="locked">
 <div class="bg" id="bgG"></div><div class="bg" id="bgH"><svg id="heavenArt" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -144,8 +146,8 @@
 <button class="fab share" id="shareBtn" type="button" aria-label="Share this invitation" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg></button>
 <button class="fab" id="musicBtn" type="button" aria-label="Pause music" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button>
 <div class="toast" id="toast" role="status"></div>
-<audio id="shloka" loop preload="none" src="assets/shloka.mp3"></audio>
-<audio id="music" loop preload="none" src="assets/wedding.mp3"></audio>
+<audio id="shloka" loop preload="auto" src="assets/shloka.mp3"></audio>
+<audio id="music" loop preload="auto" src="assets/wedding.mp3"></audio>
 <svg id="doli" viewBox="0 0 300 160" aria-hidden="true">
  <g class="dbody">
   <rect x="10" y="62" width="280" height="6" rx="3" fill="#6A3A1E"/>

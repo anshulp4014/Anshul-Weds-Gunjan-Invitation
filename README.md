@@ -17,14 +17,13 @@ css/styles.css       Styles
 js/app.js            Interactions, scroll scenes, audio
 assets/
   couple.webp        Couple illustration
-  shloka.mp3         Blessings track (loads on first gate touch)
-  wedding.mp3        Main wedding song (warms after entry / near invitation)
+  shloka.mp3         Blessings track (preloaded on open)
+  wedding.mp3        Main wedding song (preloaded on open)
 .nojekyll            Required for GitHub Pages
 ```
 
-Audio starts with `preload="none"` so the first HTML paint stays light on mobile.
-The shloka arms on the first gate touch; the wedding track warms after music starts
-(or when the invitation chapter approaches). Save-Data / 2G skips early wedding prefetch.
+Both songs preload as soon as the page opens (`<link rel="preload">` +
+`preload="auto"`) so music starts immediately after the gate.
 
 ## Put it on GitHub Pages
 
