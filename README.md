@@ -13,6 +13,7 @@ One long scroll; nothing is locked.
 
 ```text
 index.html           Structure / content
+og.jpg               Share / WhatsApp / Open Graph preview image
 css/styles.css       Styles
 js/app.js            Interactions, scroll scenes, audio
 assets/
