@@ -129,15 +129,32 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 const shloka=$('#shloka');let musicOn=false,onMain=false;const VOL=.7;
 function ramp(el,to,ms){cancelAnimationFrame(el._r);const from=el.volume,t0=performance.now();(function f(n){const q=Math.max(0,Math.min(1,(n-t0)/ms));el.volume=Math.max(0,Math.min(1,from+(to-from)*q));if(q<1)el._r=requestAnimationFrame(f);else if(to===0)el.pause();})(t0);}
 const cur=()=>onMain?music:shloka;
-/* Eager-load both tracks on page open so play starts immediately after the gate */
-try{shloka.load();music.load();}catch(e){}
+/* Do not call .load() here — it resets buffers and aborts play() raced from the gate tap. */
 
 /* the shloka carries the blessings chapter; the wedding song takes over from the invitation on */
+function fadeTo(el,vol,ms){el.volume=0;const p=el.play();if(p&&p.then)p.then(()=>ramp(el,vol,ms)).catch(()=>{
+  const retry=()=>{if(!musicOn)return;el.play().then(()=>ramp(el,vol,ms)).catch(()=>{});};
+  el.addEventListener('canplay',retry,{once:true});
+});}
 function setTrack(main){if(!musicOn||main===onMain)return;onMain=main;
  const on=main?music:shloka,off=main?shloka:music;
- on.volume=0;const p=on.play();if(p&&p.catch)p.catch(()=>{});
- ramp(on,VOL,1800);ramp(off,0,1800);}
-function startMusic(){musicOn=true;shloka.volume=0;const p=shloka.play();if(p&&p.then)p.then(()=>{mBtn.hidden=false;ramp(shloka,VOL,2500);}).catch(()=>{});$('#shareBtn').hidden=false;}
+ fadeTo(on,VOL,1800);ramp(off,0,1800);}
+function startMusic(){
+  musicOn=true;onMain=false;$('#shareBtn').hidden=false;mBtn.hidden=false;mBtn.style.opacity=1;
+  /* Kick play inside the gate gesture; retry when buffered if the first attempt was early */
+  let fading=false;
+  const kick=()=>{
+   if(!musicOn||onMain)return;
+   if(!shloka.paused){if(shloka.volume<VOL*.2&&!fading){fading=true;ramp(shloka,VOL,2500);}return;}
+   shloka.volume=0;
+   const p=shloka.play();
+   if(p&&p.then)p.then(()=>{fading=true;ramp(shloka,VOL,2500);}).catch(()=>{});
+  };
+  kick();
+  ['canplay','canplaythrough','loadeddata'].forEach(ev=>shloka.addEventListener(ev,kick,{once:true}));
+  /* Safety: if still silent after the gate animation, try once more */
+  setTimeout(kick,2800);
+}
 
 mBtn.addEventListener('click',()=>{const el=cur();if(musicOn){musicOn=false;music.pause();shloka.pause();mBtn.style.opacity=.55;mBtn.setAttribute('aria-label','Play music');}else{musicOn=true;el.volume=VOL;el.play();mBtn.style.opacity=1;mBtn.setAttribute('aria-label','Pause music');}});
 shloka.addEventListener('error',()=>{if(!onMain)setTrack(true);});
